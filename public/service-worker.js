@@ -23,12 +23,15 @@ self.addEventListener('install', function (e) {
             console.log('installing cache : ' + CACHE_NAME)
             return cache.addAll(FILES_TO_CACHE)
         })
-    )
+    );
+
+    self.skipWaiting();
 })
 
-self.addEventListener('activate', function (e) {
+self.addEventListener('activate', function(e) {
     e.waitUntil(
         caches.keys().then(keyList => {
+            console.log(keyList);
             return Promise.all(
                 keyList.map(key => {
                     if (key !== DATA_CACHE_NAME && key !== CACHE_NAME) {
@@ -48,7 +51,7 @@ self.addEventListener('fetch', function(e) {
         e.respondWith(
             caches.open(DATA_CACHE_NAME)
             .then(cache => {
-                console.log(cache, e.request)
+                console.log('im working')
                 return fetch(e.request)
                 .then(response => {
                     if(response.status === 200) {
@@ -71,7 +74,7 @@ self.addEventListener('fetch', function(e) {
             return caches.match(e.request).then(function(response) {
                 if(response) {
                     return response;
-                } else if (e.request.headers.get('accept').includes('text.html')) {
+                } else if (e.request.headers.get('accept').includes('text/html')) {
                     return caches.match('/');
                 }
             })
